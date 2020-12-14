@@ -59,36 +59,36 @@ SemaphoreHandle_t xSemaphore = NULL;
 
 static void turn_gpio_on(void *arg){
 while(1){
-int count1 = 0;
-TickType_t xTime1, xTime2, xExecutionTime;
-xTime1 = 0;
-xTime2 = 0;
-xExecutionTime = 0;
-	if (xSemaphoreTake (xSemaphore, portMAX_DELAY) == pdTRUE){
-            gpio_set_level(GPIO_OUTPUT_IO_0, 1);
+	int count1 = 0;
+	TickType_t xTime1, xTime2, xExecutionTime;
+	xTime1 = 0;
+	xTime2 = 0;
+	xExecutionTime = 0;
+		if (xSemaphoreTake (xSemaphore, portMAX_DELAY) == pdTRUE){
+			gpio_set_level(GPIO_OUTPUT_IO_0, 1);
 			xTime1 = xTaskGetTickCount();
 			// After 50 ticks / 500ms has occurred, exit while loop
-			while(xExecutionTime < 50){
-				count1++;
-				xTime2 = xTaskGetTickCount();
-				xExecutionTime = xTime2 - xTime1;
+				while(xExecutionTime < 50){
+					count1++;
+					xTime2 = xTaskGetTickCount();
+					xExecutionTime = xTime2 - xTime1;
+				}
+				vTaskDelay(1000 / portTICK_RATE_MS);
+				xSemaphoreGive(xSemaphore);			 	 
 			}
-			vTaskDelay(1000 / portTICK_RATE_MS);
-			xSemaphoreGive(xSemaphore);			 	 
-        }
-	 vTaskDelay( pdMS_TO_TICKS(10) );
+		vTaskDelay( pdMS_TO_TICKS(10) );
 	}
 }
 
 static void turn_gpio_off(void *arg){
 while(1){
-int count2 = 0;
-TickType_t xTime1, xTime2, xExecutionTime;
-xTime1 = 0;
-xTime2 = 0;
-xExecutionTime = 0;
-	if (xSemaphoreTake (xSemaphore, portMAX_DELAY) == pdTRUE){
-            gpio_set_level(GPIO_OUTPUT_IO_0, 0);
+	int count2 = 0;
+	TickType_t xTime1, xTime2, xExecutionTime;
+	xTime1 = 0;
+	xTime2 = 0;
+	xExecutionTime = 0;
+		if (xSemaphoreTake (xSemaphore, portMAX_DELAY) == pdTRUE){
+			gpio_set_level(GPIO_OUTPUT_IO_0, 0);
 			xTime1 = xTaskGetTickCount();
 			// After 50 ticks / 500ms has occurred, exit while loop
 			while(xExecutionTime < 50){
@@ -105,8 +105,8 @@ xExecutionTime = 0;
 
 static void status_message(void *arg){
 	while(1){
-			ESP_LOGI(TAG, "GPIO[2] Level: %d", gpio_get_level(2));
-			vTaskDelay(1000 / portTICK_RATE_MS);
+		ESP_LOGI(TAG, "GPIO[2] Level: %d", gpio_get_level(2));
+		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 }
 
@@ -128,8 +128,7 @@ void app_main(void)
     gpio_config(&io_conf);
 	
 	// Create mutex
-	xSemaphore = xSemaphoreCreateMutex();		
-							
+	xSemaphore = xSemaphoreCreateMutex();
     // Creates all tasks
     xTaskCreate(turn_gpio_on, "turn_gpio_on", 2048, NULL, 10, NULL);
 	xTaskCreate(turn_gpio_off, "turn_gpio_off", 2048, NULL, 9, NULL);	
